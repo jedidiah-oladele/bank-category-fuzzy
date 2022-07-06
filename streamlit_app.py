@@ -22,7 +22,7 @@ test_file = st.file_uploader(label="", type=[".csv"], key=2)
 if test_file is not None:
     
     # Prep the test file
-    test_df = pd.read_csv(test_file)[['Transaction Details']].dropna()
+    test_df = pd.read_csv(test_file)[['Transaction Date', 'Amount', 'Transaction Details']].dropna()
     test_df['Category'] = ""
     test_df['Fuzz Score'] = ""
     test_df['Closest Match'] = ""
@@ -74,8 +74,7 @@ if st.session_state['test_df'] is not None:
 
     # Download file
     def get_download_data():
-        download_df = display_df[['Transaction Details', 'Category']]
-        return download_df.to_csv(index=False).encode('utf-8')
+        return display_df.to_csv(index=False).encode('utf-8')
 
     st.download_button(label="Download Results", data=get_download_data(), file_name="Predicted Bank Data.csv")
 
@@ -87,7 +86,7 @@ if st.session_state['test_df'] is not None:
 
 
 # If user wishes to add new data
-with st.expander("Add to existing data"):
+with st.expander("Add to search data"):
     new_files = st.file_uploader(label="", type=[".csv"], key=1, accept_multiple_files=True)
     
     if new_files:
@@ -95,7 +94,7 @@ with st.expander("Add to existing data"):
         with st.spinner("Processing files..."):
 
             # Read new data and add it to existing data
-            new_dfs = [pd.read_csv(file)[['Transaction Details', 'Category']] for file in new_files]
+            new_dfs = [pd.read_csv(file)[['Transaction Date', 'Transaction Details', 'Category']] for file in new_files]
             new_dfs.append(search_df)
             search_df = pd.concat(new_dfs)
 
