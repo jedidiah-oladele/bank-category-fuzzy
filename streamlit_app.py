@@ -54,9 +54,11 @@ if test_file is not None:
 
             
             # Update progress bar
-            progress = round((i/progress_lenght) + 0.1, 1)
+            progress = round((i/progress_lenght), 1)
             progress_bar.progress(progress)
-            
+        
+        progress_bar.progress(1.0)
+        
         # Cache the data
         st.session_state['test_df'] = test_df
 
@@ -65,7 +67,7 @@ if test_file is not None:
 
 if st.session_state['test_df'] is not None:
     
-    fuzz_threshold = st.number_input(label="Fuzz Score Threshold", min_value=0, max_value=100, value=100)
+    fuzz_threshold = st.number_input(label="Fuzz Score Threshold", min_value=0, max_value=100, value=90)
 
     display_df = st.session_state['test_df']
     display_df = display_df[display_df['Fuzz Score'] >= fuzz_threshold]
