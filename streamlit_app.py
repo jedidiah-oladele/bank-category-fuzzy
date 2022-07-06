@@ -16,6 +16,7 @@ if 'test_df' not in st.session_state:
 
 # Upload file to be predicted
 st.write("#### Upload dataset to be predicted")
+st.info("Required columns are: Transaction Date, Amount, and Transaction Details")
 test_file = st.file_uploader(label="", type=[".csv"], key=2)
 
 
@@ -23,8 +24,8 @@ if test_file is not None:
     
     # Prep the test file
     test_df = pd.read_csv(test_file)[['Transaction Date', 'Amount', 'Transaction Details']].dropna()
-    test_df['Category'] = ""
     test_df['Fuzz Score'] = ""
+    test_df['Category'] = ""
     test_df['Closest Match'] = ""
 
     
@@ -48,9 +49,13 @@ if test_file is not None:
             extracted = process.extractOne(query=fuzz_query, choices=search_choices, scorer=fuzz.partial_ratio)
             
             # Append results
-            row['Category'] = search_df.at[int(extracted[2]), 'Category']
-            row['Fuzz Score'] = extracted[1]
-            row['Closest Match'] = extracted[0]
+            test_df.iat[i, 4] = search_df.at[int(extracted[2]), 'Category']
+            test_df.iat[i, 3] = extracted[1]
+            test_df.iat[i, 5] = extracted[0]
+
+            # row['Category'] = search_df.at[int(extracted[2]), 'Category']
+            # row['Fuzz Score'] = extracted[1]
+            # row['Closest Match'] = extracted[0]
 
             
             # Update progress bar
@@ -58,9 +63,11 @@ if test_file is not None:
             progress_bar.progress(progress)
         
         progress_bar.progress(1.0)
+
+
+        #test_df['Fuzz Score'] = test_df['Fuzz Score'].replace([''],'0')
+        #test_df['Fuzz Score'] = test_df['Fuzz Score'].astype(int)
         
-        test_df['Fuzz Score'] = test_df['Fuzz Score'].replace([''],'0')
-        test_df['Fuzz Score'] = test_df['Fuzz Score'].astype(int)
         # Cache the data
         st.session_state['test_df'] = test_df
 
@@ -89,6 +96,7 @@ if st.session_state['test_df'] is not None:
 
 # If user wishes to add new data
 with st.expander("Add to search data"):
+    st.info("Required columns are: Transaction Date, Transaction Details, and Category")
     new_files = st.file_uploader(label="", type=[".csv"], key=1, accept_multiple_files=True)
     
     if new_files:
