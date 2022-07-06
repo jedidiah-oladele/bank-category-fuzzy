@@ -80,6 +80,7 @@ if st.session_state['test_df'] is not None:
 
     display_df = st.session_state['test_df']
     display_df = display_df[display_df['Fuzz Score'] >= fuzz_threshold]
+    display_df.reset_index(drop=True, inplace=True)
 
     # Download file
     def get_download_data():
@@ -89,7 +90,7 @@ if st.session_state['test_df'] is not None:
 
 
     # Display dataframe
-    st.dataframe(pd.DataFrame(display_df.reset_index()))
+    st.dataframe(pd.DataFrame(display_df))
 
 
 
