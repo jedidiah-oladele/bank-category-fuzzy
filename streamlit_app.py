@@ -59,8 +59,9 @@ if test_file is not None:
         
         progress_bar.progress(1.0)
         
-        # Cache the data
+        test_df['Fuzz Score'] = test_df['Fuzz Score'].replace([''],'0')
         test_df['Fuzz Score'] = test_df['Fuzz Score'].astype(int)
+        # Cache the data
         st.session_state['test_df'] = test_df
 
         st.success("Prediction Completed!")
