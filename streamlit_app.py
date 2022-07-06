@@ -89,7 +89,7 @@ if st.session_state['test_df'] is not None:
 
 
     # Display dataframe
-    st.dataframe(pd.DataFrame(display_df))
+    st.dataframe(pd.DataFrame(display_df.reset_index()))
 
 
 
