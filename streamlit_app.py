@@ -107,9 +107,9 @@ if st.session_state['test_df'] is not None:
     display_df = st.session_state['test_df']
     
     conf_threshold = st.number_input(
-        label="Confidence Threshold (lower is better)",
-        min_value=min(display_df['Confidence (lower is better)']),
-        max_value=max(display_df['Confidence (lower is better)']),
+        label='Confidence Threshold (lower is better)',
+        min_value=display_df['Confidence (lower is better)'].min(),
+        max_value=display_df['Confidence (lower is better)'].max(),
         value=0.00
     )
 
