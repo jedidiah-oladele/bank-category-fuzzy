@@ -84,7 +84,7 @@ if test_file is not None:
                 try:
                     matched_name = transac_detials[nbrs[i][0][0]]
                     matched_category = search_df[search_df['Transaction Details']==matched_name].iat[0,2]
-                    conf = nbrs[i][1][0]
+                    conf = round(nbrs[i][1][0], 2)
                 
                 except:
                     matched_name = 'no match found'
@@ -93,7 +93,7 @@ if test_file is not None:
 
                 matches.append([origional_name, matched_name, matched_category, conf])
 
-            matches = pd.DataFrame(matches, columns=['Transaction Details', 'matched_name', 'Category', 'Confidence (lower is better)'])
+            matches = pd.DataFrame(matches, columns=['Transaction Details', 'matched_name', 'Category', 'Match Confidence (lower is better)'])
             results = test_df.merge(matches)
 
         
@@ -103,10 +103,16 @@ if test_file is not None:
 
 
 if st.session_state['test_df'] is not None:
-    
-    conf_threshold = st.number_input(label="Confidence Threshold (lower is better)", min_value=-1, max_value=1, value=0)
 
     display_df = st.session_state['test_df']
+    
+    conf_threshold = st.number_input(
+        label="Confidence Threshold (lower is better)",
+        min_value=min(display_df['Confidence (lower is better)']),
+        max_value=max(display_df['Confidence (lower is better)']),
+        value=0.00
+    )
+
     display_df = display_df[display_df['Confidence (lower is better)'] <= conf_threshold]
     display_df.reset_index(drop=True, inplace=True)
 
