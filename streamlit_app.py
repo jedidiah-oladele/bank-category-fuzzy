@@ -84,7 +84,7 @@ if test_file is not None:
                 try:
                     matched_name = transac_detials[nbrs[i][0][0]]
                     matched_category = search_df[search_df['Transaction Details']==matched_name].iat[0,2]
-                    conf = float(round(nbrs[i][1][0], 4))
+                    conf = round(nbrs[i][1][0], 4)
                 
                 except:
                     matched_name = 'no match found'
@@ -110,8 +110,8 @@ if st.session_state['test_df'] is not None:
         label='Confidence Threshold (lower is better)',
         min_value=display_df['Match Confidence (lower is better)'].min(),
         max_value=display_df['Match Confidence (lower is better)'].max(),
-        value=0.00,
-        step=0.01
+        value=float(0),
+        step=float(0.01)
     )
 
     display_df = display_df[display_df['Match Confidence (lower is better)'] <= conf_threshold]
