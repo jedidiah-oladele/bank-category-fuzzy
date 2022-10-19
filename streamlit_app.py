@@ -118,8 +118,7 @@ if st.session_state['test_df'] is not None:
 
     # Download file
     def get_download_data():
-        display_df = display_df[['Transaction Date', 'Amount', 'Transaction Details', 'Category']]
-        return display_df.to_csv(index=False).encode('utf-8')
+        return display_df[['Transaction Date', 'Amount', 'Transaction Details', 'Category']].to_csv(index=False).encode('utf-8')
 
     st.download_button(label="Download Results", data=get_download_data(), file_name="Predicted Bank Data.csv")
 
