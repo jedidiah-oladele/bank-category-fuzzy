@@ -1,14 +1,38 @@
-import streamlit as st
+import re
 import pandas as pd
-from fuzzywuzzy import fuzz
-from fuzzywuzzy import process
+import streamlit as st
+import pickle
+from ftfy import fix_text
+from sklearn.feature_extraction.text import TfidfVectorizer
 import nmslib
+
+
+def ngrams(string, n=3):
+    """Takes an input string, cleans it and converts to ngrams"""
+
+    string = str(string)
+    string = fix_text(string)
+    string = string.encode("ascii", errors="ignore").decode()
+
+    chars_to_remove = ['(', ')', '[', ']', '{', '}', '|', '.', "'", '-', ':']
+    rx = '[' + re.escape(''.join(chars_to_remove)) + ']'
+    string = re.sub(rx, '', string)
+    string = string.replace('/', ' ')
+
+    # get rid of multiple spaces and replace with a single
+    string = re.sub(' +', ' ', string).strip()
+
+    string = ' '+ string +' ' # pad names for ngrams...
+    ngrams = zip(*[string[i:] for i in range(n)])
+    return [''.join(ngram) for ngram in ngrams]
+
 
 
 st.markdown("<h1 style='text-align:center'>Bank Category Prediction</h1>", unsafe_allow_html=True)
 
-
 search_df = pd.read_csv("search_data.csv")
+transac_detials = list(search_df['Transaction Details'].unique())
+
 
 # Initialize the session as none
 if 'test_df' not in st.session_state:
@@ -25,62 +49,65 @@ if test_file is not None:
     
     # Prep the test file
     test_df = pd.read_csv(test_file)[['Transaction Date', 'Amount', 'Transaction Details']].dropna()
-    test_df['Fuzz Score'] = ""
-    test_df['Category'] = ""
-    test_df['Closest Match'] = ""
+    test_transac_detials = list(test_df['Transaction Details'].unique())
 
     
-    if st.button("Make Prediction"):
+    if st.button('Make Prediction'):
 
-        # Parse the search dataframe into a dictionary
-        search_choices = dict(zip(search_df.index, search_df["Transaction Details"]))
+        with st.spinner('Predicting..'):
 
- 
-        progress_bar = st.progress(0.0)
-        progress_lenght = test_df.shape[0]
+            # Build the TFIDF off the clean dataset
+            vectorizer = TfidfVectorizer(min_df=1, analyzer=ngrams)
+            tf_idf_matrix = vectorizer.fit_transform(transac_detials)
+            messy_tf_idf_matrix = vectorizer.transform(test_transac_detials)
 
+            # Create a random matrix to index
+            data_matrix = tf_idf_matrix
 
-        for i, row in test_df.iterrows():
+            # Intitialize the library, specify the space, the type of the vector and add data points 
+            index = nmslib.init(method='simple_invindx', space='negdotprod_sparse_fast', data_type=nmslib.DataType.SPARSE_VECTOR) 
 
-            fuzz_query = row['Transaction Details']
-            
-            # TODO Replace all '/' and numerical characters in descriptions with empty spaces and perform token_set_ratio
-            # MATCHES: dict.values
-            # RETURNS: dict_value, score, dict_key
-            extracted = process.extractOne(query=fuzz_query, choices=search_choices, scorer=fuzz.partial_ratio)
-            
-            # Append results
-            test_df.iat[i, 4] = search_df.at[int(extracted[2]), 'Category']
-            test_df.iat[i, 3] = extracted[1]
-            test_df.iat[i, 5] = extracted[0]
+            index.addDataPointBatch(data_matrix)
+            index.createIndex()
 
-            # row['Category'] = search_df.at[int(extracted[2]), 'Category']
-            # row['Fuzz Score'] = extracted[1]
-            # row['Closest Match'] = extracted[0]
-
-            
-            # Update progress bar
-            progress = round((i/progress_lenght), 1)
-            progress_bar.progress(progress)
-        
-        progress_bar.progress(1.0)
+            query_matrix = messy_tf_idf_matrix
+            query_qty = query_matrix.shape[0]
+            nbrs = index.knnQueryBatch(query_matrix, k=1, num_threads=4)
 
 
-        #test_df['Fuzz Score'] = test_df['Fuzz Score'].replace([''],'0')
-        #test_df['Fuzz Score'] = test_df['Fuzz Score'].astype(int)
+            # Add matched items
+            matches = []
+
+            for i in range(len(nbrs)):
+                origional_name = test_transac_detials[i]
+
+                try:
+                    matched_name = transac_detials[nbrs[i][0][0]]
+                    matched_category = search_df[search_df['Transaction Details']==matched_name].iat[0,2]
+                    conf = nbrs[i][1][0]
+                
+                except:
+                    matched_name = 'no match found'
+                    matched_category = 'no category'
+                    conf = None
+
+                matches.append([origional_name, matched_name, matched_category, conf])
+
+            matches = pd.DataFrame(matches, columns=['Transaction Details', 'matched_name', 'Category', 'Confidence (lower is better)'])
+            results = test_df.merge(matches)
+
         
         # Cache the data
-        st.session_state['test_df'] = test_df
-
+        st.session_state['test_df'] = results
         st.success("Prediction Completed!")
 
 
 if st.session_state['test_df'] is not None:
     
-    fuzz_threshold = st.number_input(label="Fuzz Score Threshold", min_value=0, max_value=100, value=90)
+    conf_threshold = st.number_input(label="Confidence Threshold (lower is better)", min_value=-1, max_value=1, value=0)
 
     display_df = st.session_state['test_df']
-    display_df = display_df[display_df['Fuzz Score'] >= fuzz_threshold]
+    display_df = display_df[display_df['Confidence (lower is better)'] <= conf_threshold]
     display_df.reset_index(drop=True, inplace=True)
 
     # Download file
@@ -88,7 +115,6 @@ if st.session_state['test_df'] is not None:
         return display_df.to_csv(index=False).encode('utf-8')
 
     st.download_button(label="Download Results", data=get_download_data(), file_name="Predicted Bank Data.csv")
-
 
     # Display dataframe
     st.dataframe(pd.DataFrame(display_df))
