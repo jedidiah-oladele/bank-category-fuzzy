@@ -27,7 +27,7 @@ def ngrams(string, n=3):
     return [''.join(ngram) for ngram in ngrams]
 
 
-
+st.set_page_config(layout="wide")
 st.markdown("<h1 style='text-align:center'>Bank Category Prediction</h1>", unsafe_allow_html=True)
 
 search_df = pd.read_csv("search_data.csv")
@@ -84,7 +84,7 @@ if test_file is not None:
                 try:
                     matched_name = transac_detials[nbrs[i][0][0]]
                     matched_category = search_df[search_df['Transaction Details']==matched_name].iat[0,2]
-                    conf = round(nbrs[i][1][0], 4)
+                    conf = round(nbrs[i][1][0], 5)
                 
                 except:
                     matched_name = 'no match found'
