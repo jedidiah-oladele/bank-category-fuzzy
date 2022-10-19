@@ -110,7 +110,6 @@ if st.session_state['test_df'] is not None:
         label='Confidence Threshold (lower is better)',
         min_value = min(display_df['Match Confidence (lower is better)']),
         max_value = max(display_df['Match Confidence (lower is better)']),
-        value = 0.0,
         step = 0.01
     )
 
