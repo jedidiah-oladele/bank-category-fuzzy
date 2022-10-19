@@ -108,10 +108,10 @@ if st.session_state['test_df'] is not None:
     
     conf_threshold = st.number_input(
         label='Confidence Threshold (lower is better)',
-        min_value=display_df['Match Confidence (lower is better)'].min(),
-        max_value=display_df['Match Confidence (lower is better)'].max(),
-        value=float(0),
-        step=float(0.01)
+        min_value = min(display_df['Match Confidence (lower is better)']),
+        max_value = max(display_df['Match Confidence (lower is better)']),
+        value = 0.0,
+        step = 0.01
     )
 
     display_df = display_df[display_df['Match Confidence (lower is better)'] <= conf_threshold]
