@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
+import nmslib
 
 
 st.markdown("<h1 style='text-align:center'>Bank Category Prediction</h1>", unsafe_allow_html=True)
@@ -96,7 +97,7 @@ if st.session_state['test_df'] is not None:
 
 
 # If user wishes to add new data
-with st.expander("Add to search data"):
+with st.expander("Add to Search Data"):
     st.info("Required columns are: Transaction Date, Transaction Details, and Category")
     new_files = st.file_uploader(label="", type=[".csv"], key=1, accept_multiple_files=True)
     
