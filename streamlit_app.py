@@ -95,9 +95,9 @@ if test_file is not None:
                 matches.append([origional_name, matched_name, matched_category, conf])
 
             matches = pd.DataFrame(matches, columns=['Transaction Details', 'Closest Match', 'Category', 'Match Confidence (lower is better)'])
-            min_conf = matches['Match Confidence'].min()
-            max_conf = matches['Match Confidence'].max()
-            matches['Match Confidence'] = (matches['Match Confidence'] - min_conf) / (max_conf - min_conf)
+            min_conf = matches['Match Confidence (lower is better)'].min()
+            max_conf = matches['Match Confidence (lower is better)'].max()
+            matches['Match Confidence'] = (matches['Match Confidence (lower is better)'] - min_conf) / (max_conf - min_conf)
             results = test_df.merge(matches)
 
         
