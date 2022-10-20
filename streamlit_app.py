@@ -135,7 +135,7 @@ if st.session_state['test_df'] is not None:
 
 # To add to existing search data
 with st.expander("Add to Search Data"):
-    st.info("Required columns are: Transaction Date, Transaction Details, 'CRDR' and Category")
+    st.info("Required columns are: Transaction Date, Transaction Details, CRDR, and Category")
     new_files = st.file_uploader(label="", type=[".csv"], key=1, accept_multiple_files=True)
     
     if new_files:
