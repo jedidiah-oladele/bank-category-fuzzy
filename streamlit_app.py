@@ -94,11 +94,9 @@ if test_file is not None:
 
                 matches.append([origional_name, matched_name, matched_category, conf])
 
-            matches = pd.DataFrame(matches, columns=['Transaction Details', 'Closest Match', 'Category', 'Match Confidence (lower is better)'])
-            min_conf = matches['Match Confidence (lower is better)'].min()
-            max_conf = matches['Match Confidence (lower is better)'].max()
-            matches['Match Confidence'] = round((max_conf - matches['Match Confidence (lower is better)']) / (max_conf - min_conf), 4)
-            matches['Match Confidence 2'] = (matches['Match Confidence (lower is better)'] - matches['Match Confidence (lower is better)'].mean()) / matches['Match Confidence (lower is better)'].std()
+            matches = pd.DataFrame(matches, columns=['Transaction Details', 'Closest Match', 'Category', 'conf'])
+            # Normalize and invert confidence column
+            matches['Match Confidence'] = round((matches['conf'].max() - matches['conf']) / (matches['conf'].max() - matches['conf'].min()), 4)
             results = test_df.merge(matches)
 
         
@@ -112,14 +110,14 @@ if st.session_state['test_df'] is not None:
     display_df = st.session_state['test_df']
     
     conf_threshold = st.number_input(
-        label='Confidence Threshold (lower is better)',
-        min_value = 0.0,
-        max_value = 1.0,
-        value = 0.9,
+        label='Confidence Threshold',
+        min_value = 0.00,
+        max_value = 1.00,
+        value = 0.90,
         step = 0.01
     )
 
-    #display_df = display_df[display_df['Match Confidence'] <= conf_threshold]
+    display_df = display_df[display_df['Match Confidence'] >= conf_threshold]
     display_df.reset_index(drop=True, inplace=True)
 
     # Download file
