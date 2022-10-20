@@ -153,5 +153,5 @@ with st.expander("Add to Search Data"):
             search_df.drop_duplicates(inplace=True)
 
         if st.button("Add"):
-            search_df.to_csv("search_data.csv", index=False)
-            st.success("New data saved successfully!")
+            search_df.to_csv('search_data.csv', index=False)
+            st.success('New data saved successfully!')
