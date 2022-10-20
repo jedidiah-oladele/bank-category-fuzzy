@@ -98,6 +98,7 @@ if test_file is not None:
             min_conf = matches['Match Confidence (lower is better)'].min()
             max_conf = matches['Match Confidence (lower is better)'].max()
             matches['Match Confidence'] = round((max_conf - matches['Match Confidence (lower is better)']) / (max_conf - min_conf), 4)
+            matches['Match Confidence 2'] = (matches['Match Confidence (lower is better)'] - matches['Match Confidence (lower is better)'].mean()) / matches['Match Confidence (lower is better)'].std()
             results = test_df.merge(matches)
 
         
