@@ -97,7 +97,7 @@ if test_file is not None:
             matches = pd.DataFrame(matches, columns=['Transaction Details', 'Closest Match', 'Category', 'Match Confidence (lower is better)'])
             min_conf = matches['Match Confidence (lower is better)'].min()
             max_conf = matches['Match Confidence (lower is better)'].max()
-            matches['Match Confidence'] = (matches['Match Confidence (lower is better)'] - min_conf) / (max_conf - min_conf)
+            matches['Match Confidence'] = (max_conf - min_conf) / (matches['Match Confidence (lower is better)'] - min_conf)
             results = test_df.merge(matches)
 
         
@@ -117,7 +117,7 @@ if st.session_state['test_df'] is not None:
         step = 0.01
     )
 
-    display_df = display_df[display_df['Match Confidence (lower is better)'] <= conf_threshold]
+    #display_df = display_df[display_df['Match Confidence (lower is better)'] <= conf_threshold]
     display_df.reset_index(drop=True, inplace=True)
 
     # Download file
