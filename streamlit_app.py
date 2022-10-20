@@ -111,10 +111,10 @@ if st.session_state['test_df'] is not None:
     
     conf_threshold = st.number_input(
         label='Confidence Threshold',
-        min_value = 0.000,
-        max_value = 1.000,
-        value = 0.800,
-        step = 0.005
+        min_value = 0.00,
+        max_value = 1.00,
+        value = 0.80,
+        step = 0.01
     )
 
     display_df = display_df[display_df['Match Confidence'] >= conf_threshold]
