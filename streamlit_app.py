@@ -48,7 +48,7 @@ test_file = st.file_uploader(label="", type=[".csv"], key=2)
 if test_file is not None:
     
     # Prep the test file
-    test_df = pd.read_csv(test_file)[['Transaction Date', 'Amount', 'Transaction Details']].dropna()
+    test_df = pd.read_csv(test_file)
     test_transac_detials = list(test_df['Transaction Details'].unique())
 
     
@@ -122,7 +122,7 @@ if st.session_state['test_df'] is not None:
 
     # Download file
     def get_download_data():
-        return display_df[['Transaction Date', 'Amount', 'Transaction Details', 'Category']].to_csv(index=False).encode('utf-8')
+        return display_df.drop(columns=['Closest Match']).to_csv(index=False).encode('utf-8')
 
     st.download_button(label="Download Results", data=get_download_data(), file_name="Predicted Bank Data.csv")
 
@@ -149,7 +149,7 @@ with st.expander("Add to Search Data"):
 
             # Clean data
             search_df.dropna(inplace=True)
-            search_df.drop_duplicates(subset=['Transaction Details'], inplace=True)
+            search_df.drop_duplicates(subset=['Transaction Details', 'Category'], inplace=True)
 
         if st.button("Add"):
             search_df.to_csv("search_data.csv", index=False)
