@@ -94,9 +94,9 @@ if test_file is not None:
 
                 matches.append([origional_name, matched_name, matched_category, conf])
 
-            matches = pd.DataFrame(matches, columns=['Transaction Details', 'Closest Match', 'Category', 'conf'])
+            matches = pd.DataFrame(matches, columns=['Transaction Details', 'Closest Match', 'Category', 'Match Confidence'])
             # Normalize and invert confidence column
-            matches['Match Confidence'] = (matches['conf'].max() - matches['conf']) / (matches['conf'].max() - matches['conf'].min())
+            matches['Match Confidence'] = (matches['Match Confidence'].max() - matches['Match Confidence']) / (matches['Match Confidence'].max() - matches['Match Confidence'].min())
             results = test_df.merge(matches)
 
         
@@ -111,10 +111,10 @@ if st.session_state['test_df'] is not None:
     
     conf_threshold = st.number_input(
         label='Confidence Threshold',
-        min_value = 0.00,
-        max_value = 1.00,
-        value = 0.90,
-        step = 0.01
+        min_value = 0.000,
+        max_value = 1.000,
+        value = 0.800,
+        step = 0.005
     )
 
     display_df = display_df[display_df['Match Confidence'] >= conf_threshold]
