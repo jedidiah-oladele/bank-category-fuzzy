@@ -96,7 +96,7 @@ if test_file is not None:
 
             matches = pd.DataFrame(matches, columns=['Transaction Details', 'Closest Match', 'Category', 'conf'])
             # Normalize and invert confidence column
-            matches['Match Confidence'] = round((matches['conf'].max() - matches['conf']) / (matches['conf'].max() - matches['conf'].min()), 4)
+            matches['Match Confidence'] = (matches['conf'].max() - matches['conf']) / (matches['conf'].max() - matches['conf'].min())
             results = test_df.merge(matches)
 
         
@@ -128,6 +128,7 @@ if st.session_state['test_df'] is not None:
 
     # Display dataframe
     st.dataframe(pd.DataFrame(display_df))
+    st.write(f"Number of rows: {display_df.shape[0]}")
 
 
 
