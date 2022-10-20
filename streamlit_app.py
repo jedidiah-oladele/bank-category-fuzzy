@@ -133,9 +133,9 @@ if st.session_state['test_df'] is not None:
 
 
 
-# If user wishes to add new data
+# To add to existing search data
 with st.expander("Add to Search Data"):
-    st.info("Required columns are: Transaction Date, Transaction Details, and Category")
+    st.info("Required columns are: Transaction Date, Transaction Details, 'CRDR' and Category")
     new_files = st.file_uploader(label="", type=[".csv"], key=1, accept_multiple_files=True)
     
     if new_files:
@@ -143,7 +143,7 @@ with st.expander("Add to Search Data"):
         with st.spinner("Processing files..."):
 
             # Read new data and add it to existing data
-            new_dfs = [pd.read_csv(file)[['Transaction Date', 'Transaction Details', 'Category']] for file in new_files]
+            new_dfs = [pd.read_csv(file)[['Transaction Date', 'Transaction Details', 'CRDR', 'Category']] for file in new_files]
             new_dfs.append(search_df)
             search_df = pd.concat(new_dfs)
 
